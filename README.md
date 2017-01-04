@@ -105,15 +105,15 @@ Protostuff;277eded;277eded;Duration;io.protostuff.JsonNumericStandardTest.testPa
 * change to hopper directory on command line
 * compile Python files (optional)
 ```bash
-python -m compileall ./
+	python -m compileall ./
 ```
 * run benchmarks (minimum required parameters are -f, -o and -t)
 ```bash
-python hopper.py -f input.xml -o output.cvs -t benchmark -b commits
+	python hopper.py -f input.xml -o output.cvs -t benchmark -b commits
 ```
 * run unit tests (minimum required parameters are -f, -o and -t)    
 ```bash
-python hopper.py -f input.xml -o output.cvs -t unit -b commits
+	python hopper.py -f input.xml -o output.cvs -t unit -b commits
 ```
 
 # Maintainers
