@@ -104,18 +104,19 @@ Protostuff;277eded;277eded;Duration;io.protostuff.JsonNumericStandardTest.testPa
 	* change JMH root directory
 * change to hopper directory on command line
 * compile Python files (optional)
-	```bash
+	```Bash
 	python -m compileall ./
 	```
 * run benchmarks (minimum required parameters are -f, -o and -t)
-	```bash
-	python ./Hopper.py -f input.xml -o output.cvs -t benchmark -b commits
+	```Bash
+	python hopper.py -f input.xml -o output.cvs -t benchmark -b commits
 	```
 * run unit tests (minimum required parameters are -f, -o and -t)
-    ```bash
-	python ./Hopper.py -f input.xml -o outpur.cvs -t unit -b commits
+    ```Bash
+    python hopper.py -f input.xml -o output.cvs -t unit -b commits
 	```
 
 # Maintainers
 [Christoph Laaber](https://github.com/chrstphlbr)
+
 [Philipp Leitner](https://github.com/xLeitix)
