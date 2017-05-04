@@ -19,7 +19,7 @@ class MvnVersionWalker(history.Walker):
     def parse_config(self, config_file):
         return Configuration(config_file)
 
-    def generate_version_list(self, start = None, end = None, step = None):
+    def generate_version_list(self, start = None, end = None, step = None, **kwargs):
 
         # note that this implementation ignores "step"
 

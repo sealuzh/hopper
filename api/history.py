@@ -48,8 +48,9 @@ class Walker:
             projected_end = now + datetime.timedelta(minutes = m_projected)
             i += 1
             print "### Execution for version %s took %s minutes. ###" % (version, m_diff)
-            print "### Still have %s versions to go, that will be %s hours and %s minutes. Projected end is %s. ###"\
-                  % (remaining_versions, h_projected, m_projected_rem, projected_end)
+            if remaining_versions > 0:
+               print "### Still have %s versions to go, that will be %s hours and %s minutes. Projected end is %s. ###"\
+                     % (remaining_versions, h_projected, m_projected_rem, projected_end)
             if res:
                 all_results.versions.append(res)
                 if callback:
