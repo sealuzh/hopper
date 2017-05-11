@@ -40,13 +40,13 @@ class Walker:
             end = time.time()
             diff = end - start
             m_diff = int(diff / 60)
+            i += 1
             remaining_versions = (len(versions) - i)
             m_projected = m_diff * remaining_versions
             h_projected = int(m_projected/ 60)
             m_projected_rem = int(m_projected % 60)
             now = datetime.datetime.now()
             projected_end = now + datetime.timedelta(minutes = m_projected)
-            i += 1
             print "### Execution for version %s took %s minutes. ###" % (version, m_diff)
             if remaining_versions > 0:
                print "### Still have %s versions to go, that will be %s hours and %s minutes. Projected end is %s. ###"\
