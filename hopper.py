@@ -2,7 +2,7 @@ import argparse
 
 from impl import MvnGit
 from impl import ResultParser
-from impl.FileDumper import FileDumper
+from impl.FileDumper import FileDumper, CloudDumper
 from impl.GradleCommitWalker import GradleJMHGitRunner
 from impl.MvnCommitWalker import MvnCommitWalker
 from impl.MvnVersionWalker import MvnVersionWalker, JMHMvnRunner
@@ -18,6 +18,7 @@ def parse_cmd_params():
     parser.add_argument('-t', '--type', required=True, choices=('unit', 'benchmark'), dest="type")
     parser.add_argument('-b', '--backend', choices=('versions', 'commits'), default='commits', dest='backend')
     parser.add_argument('-r', '--runner', choices=('mvn', 'gradle'), default='mvn', dest='runner')
+    parser.add_argument('--cloud', dest='cloud', default=None)
     parser.add_argument('--from', dest='start')
     parser.add_argument('--to', dest='to')
     parser.add_argument('--step', dest='step', type=int)
@@ -86,8 +87,10 @@ with open(args.outfile, "w") as file:
     custom_args = ret['custom_args']
 
     config = backend.config
-
-    callback = FileDumper(file, args, config)
+    if args.cloud:
+        callback = CloudDumper(args.cloud)
+    else:
+        callback = FileDumper(file, args, config)
     versions = backend.generate_version_list(start=args.start, end=args.to, step=args.step, **custom_args)
     print "### We will be looking at %s distinct commits. ###" % len(versions)
     print versions

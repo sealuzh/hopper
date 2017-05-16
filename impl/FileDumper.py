@@ -1,4 +1,7 @@
 import api.history as history
+from google.cloud import storage
+import googleapiclient.discovery
+import socket
 
 
 class FileDumper(history.WalkerCallback):
@@ -55,7 +58,45 @@ class FileDumper(history.WalkerCallback):
         self.file.write("%s;%s;%s;%s;%s;%s\n"
                         % (_stringify(project), _stringify(revision), _stringify(sha), _stringify(params), _stringify(test), _stringify(val)))
         self.file.flush()
+        
+class CloudDumper(history.WalkerCallback):
+    """ Implementation of a CloudDumper.py that dumps the intermediary results to a CSV file in a bucket storage.
+    """
 
+    def __init__(self, project_id):
+        """ Initialize the file dumper with a given file handle. file needs to be set writable.
+            Note that this class does nothing about opening or closing the file. The caller
+            is responsible for making sure that the file is closed after usage (but not before).
+
+        :return:
+        """
+        self.bucket = self.get_bucket(project_id)
+        
+    def get_bucket(self, project_id):
+        service = googleapiclient.discovery.build('storage', 'v1')
+        buckets = service.buckets().list(project=project_id).execute()
+        storage_client = storage.Client(project=project_id)
+        return storage_client.get_bucket(buckets['items'][0]['name'])
+        
+    def results_received(self, project, version, sha, results):
+        
+        if results.benchmarks:
+            store_string = self.write_line("Project", "Version", "SHA", "Configuration", "Test", "RawVal")
+            for b in results.benchmarks:
+                benchmark = b.benchmark
+                parameters = b.parameter
+                for v in b.individual_results:
+                    store_string += self.write_line(project, version, sha, parameters, benchmark, v)
+            tmp = socket.gethostname() + '-' + str(version) + ".csv"
+            tmp_blob = self.bucket.blob(tmp)
+            tmp_blob.upload_from_string(store_string)
+
+    def write_line(self, project, revision, sha, params, test, val):
+        """ Write a line of content to the file.
+        :return: None
+        """
+        store_string = "%s;%s;%s;%s;%s;%s\n" % (_stringify(project), _stringify(revision), _stringify(sha), _stringify(params), _stringify(test), _stringify(val))
+        return store_string
 
 def _stringify(something):
     return unicode(something).encode('utf-8')
