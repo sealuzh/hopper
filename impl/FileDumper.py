@@ -1,8 +1,7 @@
 import api.history as history
 from google.cloud import storage
-import googleapiclient.discovery
 import socket
-
+import os
 
 class FileDumper(history.WalkerCallback):
     """ Implementation of a FileDumper.py that dumps the intermediary results to a CSV file.
@@ -63,20 +62,20 @@ class CloudDumper(history.WalkerCallback):
     """ Implementation of a CloudDumper.py that dumps the intermediary results to a CSV file in a bucket storage.
     """
 
-    def __init__(self, project_id):
+    def __init__(self, args):
         """ Initialize the file dumper with a given file handle. file needs to be set writable.
             Note that this class does nothing about opening or closing the file. The caller
             is responsible for making sure that the file is closed after usage (but not before).
 
         :return:
         """
-        self.bucket = self.get_bucket(project_id)
+        bucket_name, credentials = (args[0], args[1]) if '.json' in args[1] else (args[1], args[0])
+        self.bucket = self.get_bucket(bucket_name, credentials)
         
-    def get_bucket(self, project_id):
-        service = googleapiclient.discovery.build('storage', 'v1')
-        buckets = service.buckets().list(project=project_id).execute()
-        storage_client = storage.Client(project=project_id)
-        return storage_client.get_bucket(buckets['items'][0]['name'])
+    def get_bucket(self, bucket_name, credentials):
+        os.environ['GOOGLE_APPLICATION_CREDENTIALS']= credentials
+        storage_client = storage.Client()
+        return storage_client.get_bucket(bucket_name)
         
     def results_received(self, project, version, sha, results):
         
