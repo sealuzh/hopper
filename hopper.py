@@ -7,7 +7,6 @@ from impl.GradleCommitWalker import GradleJMHGitRunner
 from impl.MvnCommitWalker import MvnCommitWalker
 from impl.MvnVersionWalker import MvnVersionWalker, JMHMvnRunner
 
-
 def parse_cmd_params():
     '''
     Wrap the ugly cmd param parsing into a separate function.
@@ -18,7 +17,7 @@ def parse_cmd_params():
     parser.add_argument('-t', '--type', required=True, choices=('unit', 'benchmark'), dest="type")
     parser.add_argument('-b', '--backend', choices=('versions', 'commits'), default='commits', dest='backend')
     parser.add_argument('-r', '--runner', choices=('mvn', 'gradle'), default='mvn', dest='runner')
-    parser.add_argument('--cloud', dest='cloud', default=None)
+    parser.add_argument('--cloud', dest='cloud', default=None, nargs=2, action='append')
     parser.add_argument('--from', dest='start')
     parser.add_argument('--to', dest='to')
     parser.add_argument('--step', dest='step', type=int)
@@ -75,10 +74,8 @@ def create_backend_runner(args):
 '''
 Beginning of main Hopper script.
 '''
-
 # parse commandline parameters
 args = parse_cmd_params()
-
 with open(args.outfile, "w") as file:
 
     ret = create_backend_runner(args)
@@ -88,7 +85,7 @@ with open(args.outfile, "w") as file:
 
     config = backend.config
     if args.cloud:
-        callback = CloudDumper(args.cloud)
+        callback = CloudDumper(args.cloud[0])
     else:
         callback = FileDumper(file, args, config)
     versions = backend.generate_version_list(start=args.start, end=args.to, step=args.step, **custom_args)

@@ -14,16 +14,6 @@ from impl.GitRepoHandler import GitRepoHandler
 ###############
 ### private ###
 ###############
-def _checkout_version(project_dir, version, mode):
-    repo = GitRepoHandler(project_dir)
-    if mode == 'commit-mode':
-        sha = repo.checkout_commit(version)
-    elif mode == 'time-mode':
-        sha = repo.checkout_time(version)
-    else:
-        raise RuntimeError("Mode not yet implemented.")
-    return sha
-
 
 def _run(statement, *args):
     try:
@@ -72,6 +62,16 @@ def _add_results(old_results, new_results):
 ##############
 ### public ###
 ##############
+def checkout_version(project_dir, version, mode):
+    repo = GitRepoHandler(project_dir)
+    if mode == 'commit-mode':
+        sha = repo.checkout_commit(version)
+    elif mode == 'time-mode':
+        sha = repo.checkout_time(version)
+    else:
+        raise RuntimeError("Mode not yet implemented.")
+    return sha
+
 class JMHRunner(runner.Test):
     JAVA_COMMAND = [os.environ['JAVA_HOME']+"/bin/java", "-jar",  "target/benchmarks.jar"]
     JMH_ARGS = "%s -rf json -rff %s"
@@ -82,7 +82,7 @@ class JMHRunner(runner.Test):
 
     def run(self, version, parser, run=None, **kwargs):
         try:
-            sha = _checkout_version(self.config.project.dir, version, kwargs['mode'])
+            sha = checkout_version(self.config.project.dir, version, kwargs['mode'])
             _run(_build_cmd(**kwargs))
             pom_version = self.find_pom_version()
             jmh = BasicJMHRunner(self.config)
@@ -116,7 +116,7 @@ class JUnitRunner(runner.Test):
 
     def run(self, version, parser, tests=None, **kwargs):
         # checkout current version
-        sha = _checkout_version(self.config.project.dir, version, kwargs['mode'])
+        sha = checkout_version(self.config.project.dir, version, kwargs['mode'])
         # add regression
         if self.regression:
             self._add_regression(sha)

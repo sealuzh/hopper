@@ -5,7 +5,6 @@ from impl import MvnGit
 from impl.BasicJMHRunner import BasicJMHRunner
 from impl.GitRepoHandler import GitRepoHandler
 
-
 class GradleJMHGitRunner(MvnGit.JMHRunner):
 
     GRADLE_COMMAND = "./gradlew"
@@ -18,7 +17,7 @@ class GradleJMHGitRunner(MvnGit.JMHRunner):
 
     def run(self, version, parser, run=None, **kwargs):
         try:
-            sha = self.checkout_version(version, kwargs['mode'])
+            sha = MvnGit.checkout_version(self.config.project.dir, version, kwargs['mode'])
             self.fix_gradle_config()    # we use this to fix an issue in older RxJava configurations
             mvn_version = self.compile_version()
             print "Found Mvn version %s" % mvn_version
