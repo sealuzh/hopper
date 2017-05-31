@@ -2,6 +2,7 @@ import api.history as history
 from google.cloud import storage
 import socket
 import os
+import time
 
 class FileDumper(history.WalkerCallback):
     """ Implementation of a FileDumper.py that dumps the intermediary results to a CSV file.
@@ -86,7 +87,8 @@ class CloudDumper(history.WalkerCallback):
                 parameters = b.parameter
                 for v in b.individual_results:
                     store_string += self.write_line(project, version, sha, parameters, benchmark, v)
-            tmp = socket.gethostname() + '-' + str(version) + ".csv"
+            t = str(time.time()).replace('.','')
+            tmp = socket.gethostname() + '-' + str(version) + '-' + str(t) + ".csv"
             tmp_blob = self.bucket.blob(tmp)
             tmp_blob.upload_from_string(store_string)
 
